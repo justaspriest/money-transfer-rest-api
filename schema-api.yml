@@ -1,0 +1,76 @@
+openapi: 3.0.0
+
+info:
+  title: Money Transfer API
+  version: 1.0.0
+
+paths:
+  /transactions:
+    get:
+      summary: Get transaction info by ID
+      parameters:
+        - $ref: '#/components/parameters/Identifier'
+      responses:
+        200:
+          $ref: '#/components/responses/TransactionInfo'
+
+    post:
+      summary: Create new transaction between accounts
+      requestBody:
+        $ref: '#/components/requestBodies/CreateTransaction'
+      responses:
+        200:
+          $ref: '#/components/responses/TransactionInfo'
+
+components:
+  schemas:
+    Identifier:
+      type: integer
+
+    TransactionData:
+      type: object
+      required:
+        - from
+        - to
+      properties:
+        from:
+          allOf:
+            - $ref: '#/components/schemas/Identifier'
+        to:
+          allOf:
+            - $ref: '#/components/schemas/Identifier'
+
+    Transaction:
+      allOf:
+        - $ref: '#/components/schemas/TransactionData'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              allOf:
+                - $ref: '#/components/schemas/Identifier'
+
+  parameters:
+    Identifier:
+      name: Identifier
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Identifier'
+
+  requestBodies:
+    CreateTransaction:
+      description: Create transaction payload
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TransactionData'
+
+  responses:
+    TransactionInfo:
+      description: Transaction info
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Transaction'
