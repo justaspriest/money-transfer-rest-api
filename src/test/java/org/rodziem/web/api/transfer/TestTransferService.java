@@ -2,51 +2,61 @@ package org.rodziem.web.api.transfer;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.rodziem.web.api.MoneyTransferConfig;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class TestTransferService {
 
-    private final TransferDTO testDto = new TransferDTO();
-
-    private final ITransferService transferService = null;
+    private static TransferService transferService;
 
     @BeforeAll
-    private void prepareTestDTO() {
+    private static void prepareTransferService() throws Exception {
+        transferService = new MoneyTransferConfig().getTransferService();
+    }
+
+    private TransferDTO createTestDTO() {
         final int fromId = 1;
         final int toId = 2;
+        final String amount = "10.0";
+        final String currencyCode = "RUB";
 
-        testDto.addresserId = fromId;
-        testDto.addresseeId = toId;
+        final TransferDTO testDto = new TransferDTO();
+        testDto.senderId = fromId;
+        testDto.receiverId = toId;
+        testDto.amount = amount;
+        testDto.currencyCode = currencyCode;
+        return testDto;
     }
 
     @Test
     void testService() {
-        final TransferEntity transfer1 = transferService.createTransfer(testDto);
-        final TransferEntity transfer2 = transferService.getTransfer(transfer1.getId());
+        try {
+            final TransferDTO testDTO = createTestDTO();
+            final TransferDTO createdDTO = transferService.createTransfer(testDTO);
+            final TransferDTO receivedDTO = transferService.getTransfer(createdDTO.id);
 
-        assertEquals(transfer1, transfer2);
+            assertEquals(createdDTO, receivedDTO);
+        } catch (final SQLException e) {
+            fail(e);
+        }
     }
 
     @Test
     void testEntity() {
-        final TransferEntity transfer = transferService.createTransfer(testDto);
+        try {
+            final TransferDTO testDTO = createTestDTO();
+            final TransferDTO createdDTO = transferService.createTransfer(testDTO);
 
-        assertEquals(transfer.getAddresserId(), testDto.addresserId);
-        assertEquals(transfer.getAddresseeId(), testDto.addresseeId);
-    }
-
-    @Test
-    void testMapper() {
-        final TransferMapper mapper = new TransferMapper();
-
-        final TransferEntity entity1 = mapper.toEntity(testDto);
-        final TransferDTO dto1 = mapper.toDto(entity1);
-
-        assertEquals(testDto, dto1);
-
-        final TransferEntity entity2 = mapper.toEntity(testDto);
-
-        assertEquals(entity1, entity2);
+            assertNotNull(createdDTO.id);
+            assertEquals(createdDTO.senderId, testDTO.senderId);
+            assertEquals(createdDTO.receiverId, testDTO.receiverId);
+            assertEquals(createdDTO.amount, testDTO.amount);
+            assertEquals(createdDTO.currencyCode, testDTO.currencyCode);
+        } catch (final SQLException e) {
+            fail(e);
+        }
     }
 }
