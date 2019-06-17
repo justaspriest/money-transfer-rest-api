@@ -10,30 +10,32 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TestTransferService {
 
-    private static TransferService transferService;
+    private static MoneyTransferConfig config;
 
     @BeforeAll
     private static void prepareTransferService() throws Exception {
-        transferService = new MoneyTransferConfig().getTransferService();
+        config = new MoneyTransferConfig();
     }
 
     private TransferDTO createTestDTO() {
-        final int fromId = 1;
-        final int toId = 2;
-        final String amount = "10.0";
-        final String currencyCode = "RUB";
+        final var fromId = 1;
+        final var toId = 2;
+        final var amount = "10.0";
+        final var currencyCode = "RUB";
 
-        final TransferDTO testDto = new TransferDTO();
+        final var testDto = new TransferDTO();
         testDto.senderId = fromId;
         testDto.receiverId = toId;
         testDto.amount = amount;
         testDto.currencyCode = currencyCode;
+        testDto.status = TransferDTO.Status.PENDING;
         return testDto;
     }
 
     @Test
     void testService() {
         try {
+            final var transferService = config.getTransferService();
             final TransferDTO testDTO = createTestDTO();
             final TransferDTO createdDTO = transferService.createTransfer(testDTO);
             final TransferDTO receivedDTO = transferService.getTransfer(createdDTO.id);
@@ -47,14 +49,16 @@ class TestTransferService {
     @Test
     void testEntity() {
         try {
-            final TransferDTO testDTO = createTestDTO();
+            final var testDTO = createTestDTO();
+            final var transferService = config.getTransferService();
             final TransferDTO createdDTO = transferService.createTransfer(testDTO);
 
-            assertNotNull(createdDTO.id);
+            assertTrue(createdDTO.id > 0);
             assertEquals(createdDTO.senderId, testDTO.senderId);
             assertEquals(createdDTO.receiverId, testDTO.receiverId);
             assertEquals(createdDTO.amount, testDTO.amount);
             assertEquals(createdDTO.currencyCode, testDTO.currencyCode);
+            assertEquals(createdDTO.status, testDTO.status);
         } catch (final SQLException e) {
             fail(e);
         }

@@ -2,6 +2,10 @@ package org.rodziem.web.api.transfer;
 
 public class TransferDTO {
 
+    public enum Status {
+        PENDING, SUCCESS, ERROR
+    }
+
     public int id;
 
     public int senderId;
@@ -11,6 +15,8 @@ public class TransferDTO {
     public String amount;
 
     public String currencyCode;
+
+    public Status status;
 
     public boolean equals(final Object object) {
         if (this == object) {
@@ -24,6 +30,7 @@ public class TransferDTO {
                 senderId == dataObject2.senderId &&
                 receiverId == dataObject2.receiverId &&
                 amount.equals(dataObject2.amount) &&
-                currencyCode.equals(dataObject2.currencyCode);
+                currencyCode.equals(dataObject2.currencyCode) &&
+                status.equals(status);
     }
 }

@@ -40,7 +40,7 @@ import org.rodziem.web.api.generated.tables.records.TransferRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Transfer extends TableImpl<TransferRecord> {
 
-    private static final long serialVersionUID = 1505338593;
+    private static final long serialVersionUID = -1299715070;
 
     /**
      * The reference instance of <code>TRANSFER_API.TRANSFER</code>
@@ -79,6 +79,11 @@ public class Transfer extends TableImpl<TransferRecord> {
      * The column <code>TRANSFER_API.TRANSFER.CURRENCY</code>.
      */
     public final TableField<TransferRecord, String> CURRENCY = createField("CURRENCY", org.jooq.impl.SQLDataType.VARCHAR(32), this, "");
+
+    /**
+     * The column <code>TRANSFER_API.TRANSFER.STATUS</code>.
+     */
+    public final TableField<TransferRecord, String> STATUS = createField("STATUS", org.jooq.impl.SQLDataType.VARCHAR(16).nullable(false), this, "");
 
     /**
      * Create a <code>TRANSFER_API.TRANSFER</code> table reference

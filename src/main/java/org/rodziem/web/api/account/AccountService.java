@@ -1,20 +1,41 @@
 package org.rodziem.web.api.account;
 
+import org.rodziem.web.api.MoneyTransferConfig;
 import org.rodziem.web.api.common.Money;
 import org.rodziem.web.api.generated.tables.records.AccountRecord;
+import org.rodziem.web.api.generated.tables.records.TransferRecord;
+
+import java.sql.SQLException;
 
 public class AccountService {
 
-    public void applyTransfer(final AccountRecord sender, final AccountRecord receiver, final Money moneyToTransfer) {
+    private final MoneyTransferConfig config;
+
+    public AccountService(final MoneyTransferConfig config) {
+        this.config = config;
+    }
+
+    public AccountDTO getAccount(final int id) throws SQLException {
+        final var accountRepo = config.getAccountRepo();
+        final var account = accountRepo.getAccount(id);
+        return new AccountMapper().toDto(account);
+    }
+
+    public void applyTransfer(final TransferRecord transfer) throws SQLException {
+        final var accountRepo = config.getAccountRepo();
+        final AccountRecord sender = accountRepo.getAccount(transfer.getSender());
+        final AccountRecord receiver = accountRepo.getAccount(transfer.getReceiver());
+
         final Money senderWallet = new Money(sender.getAmount(), sender.getCurrency());
         final Money receiverWallet = new Money(receiver.getAmount(), receiver.getCurrency());
 
-        if (moneyToTransfer.isEmpty()) {
+        final Money transferMoney = new Money(transfer.getAmount(), transfer.getCurrency());
+        if (transferMoney.isEmpty()) {
             return;
-        } else if (moneyToTransfer.isPositive()) {
-            calculate(senderWallet, receiverWallet, moneyToTransfer);
+        } else if (transferMoney.isPositive()) {
+            calculate(senderWallet, receiverWallet, transferMoney);
         } else {
-            calculate(receiverWallet, senderWallet, moneyToTransfer);
+            calculate(receiverWallet, senderWallet, transferMoney);
         }
 
         sender.setAmount(senderWallet.getAmount());

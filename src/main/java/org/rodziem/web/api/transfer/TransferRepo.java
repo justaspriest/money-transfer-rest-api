@@ -17,22 +17,21 @@ public class TransferRepo {
         this.dataSource = dataSource;
     }
 
-    public int createTransfer(final TransferDTO transferData) throws SQLException {
-        final TransferRecord transfer = DSL.using(dataSource.getConnection(), SQLDialect.H2)
-                .newRecord(TRANSFER);
+    public TransferRecord createTransfer(final TransferDTO transferData) throws SQLException {
+        final var transfer = new TransferMapper().toEntity(transferData);
 
-        transfer.setSender(transferData.senderId);
-        transfer.setReceiver(transferData.receiverId);
-        transfer.setAmount(transferData.amount);
-        transfer.setCurrency(transferData.currencyCode);
+        DSL.using(dataSource.getConnection(), SQLDialect.H2)
+                .attach(transfer);
 
-        transfer.store();
-
-        return transfer.getId();
+        transfer.changed(TRANSFER.ID, false);
+        transfer.insert();
+        return transfer;
     }
 
     public TransferRecord getTransfer(final int transferId) throws SQLException {
         return DSL.using(dataSource.getConnection(), SQLDialect.H2)
                 .fetchOne(TRANSFER, TRANSFER.ID.eq(transferId));
     }
+
+
 }

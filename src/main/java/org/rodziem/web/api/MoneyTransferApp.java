@@ -1,9 +1,6 @@
 package org.rodziem.web.api;
 
 import org.rodziem.web.api.common.Path;
-import org.rodziem.web.api.info.InfoController;
-import org.rodziem.web.api.transfer.TransferController;
-import org.rodziem.web.api.transfer.TransferService;
 
 import java.util.logging.Logger;
 
@@ -18,9 +15,9 @@ public class MoneyTransferApp {
 
     public static void main(String[] args) {
         try {
-            final MoneyTransferApp app = new MoneyTransferApp();
-            app.configure();
-            app.initRoutes();
+            final var app = new MoneyTransferApp();
+            final var config = new MoneyTransferConfig();
+            app.configure(config);
         } catch (final Exception e) {
             e.printStackTrace();
             log.severe(e.getLocalizedMessage());
@@ -28,18 +25,21 @@ public class MoneyTransferApp {
         }
     }
 
-    private void configure() throws Exception {
+    private void configure(final MoneyTransferConfig config) {
         port(8080);
-        final TransferService transferService = new MoneyTransferConfig().getTransferService();
+        initRoutes(config);
     }
 
-    private void initRoutes() {
+    private void initRoutes(final MoneyTransferConfig config) {
         log.info("Initiating routes");
 
-        get(Path.INFO, InfoController.getInfo);
-        path(Path.INFO, () -> path(versionPath, () -> {
-            get(Path.TRANSFER, TransferController.getTransfer);
-            post(Path.TRANSFER, TransferController.createTransfer);
+        get(Path.INFO, config.getInfoController());
+        path(Path.API, () -> path(versionPath, () -> {
+            get(Path.READ_ACCOUNT, config.getAccountController());
+            get(Path.READ_TRANSFER, config.getTransferController());
+            post(Path.CREATE_TRANSFER, config.createTransferController());
         }));
+
+        log.info("Routes have initialised successfully");
     }
 }
