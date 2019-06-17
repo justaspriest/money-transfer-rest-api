@@ -19,7 +19,6 @@ public class MoneyTransferApp {
             final var config = new MoneyTransferConfig();
             app.configure(config);
         } catch (final Exception e) {
-            e.printStackTrace();
             log.severe(e.getLocalizedMessage());
             exit(1);
         }

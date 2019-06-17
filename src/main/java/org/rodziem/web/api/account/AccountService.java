@@ -18,6 +18,11 @@ public class AccountService {
     public AccountDTO getAccount(final int id) throws SQLException {
         final var accountRepo = config.getAccountRepo();
         final var account = accountRepo.getAccount(id);
+
+        if (account == null) {
+            return null;
+        }
+
         return new AccountMapper().toDto(account);
     }
 
@@ -45,7 +50,7 @@ public class AccountService {
     }
 
     private void calculate(final Money senderWallet, final Money receiverWallet, final Money transferMoney) {
-        receiverWallet.sub(transferMoney);
-        senderWallet.add(transferMoney);
+        senderWallet.sub(transferMoney);
+        receiverWallet.add(transferMoney);
     }
 }

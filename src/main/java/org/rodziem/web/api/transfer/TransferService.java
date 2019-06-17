@@ -16,6 +16,11 @@ public class TransferService {
     public TransferDTO createTransfer(final TransferDTO dataObject) throws SQLException {
         final var transferRepo = config.getTransferRepo();
         final var transfer = transferRepo.createTransfer(dataObject);
+
+        if (transfer == null) {
+            return null;
+        }
+
         final var accountService = config.getAccountService();
         accountService.applyTransfer(transfer);
         return new TransferMapper().toDto(transfer);
@@ -24,6 +29,11 @@ public class TransferService {
     public TransferDTO getTransfer(final int id) throws SQLException {
         final var transferRepo = config.getTransferRepo();
         final TransferRecord transfer = transferRepo.getTransfer(id);
+
+        if (transfer == null) {
+            return null;
+        }
+
         return new TransferMapper().toDto(transfer);
     }
 }

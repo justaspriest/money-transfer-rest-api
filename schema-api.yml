@@ -22,23 +22,54 @@ paths:
         200:
           $ref: '#/components/responses/TransactionInfo'
 
+  /accounts:
+    get:
+      summary: Get account info by id
+      parameters:
+        - $ref: '#/components/parameters/Identifier'
+      responses:
+        200:
+          $ref: '#/components/responses/AccountInfo'
+
+
 components:
   schemas:
     Identifier:
       type: integer
 
-    TransactionData:
+    WalletData:
       type: object
-      required:
-        - from
-        - to
       properties:
-        from:
-          allOf:
-            - $ref: '#/components/schemas/Identifier'
-        to:
-          allOf:
-            - $ref: '#/components/schemas/Identifier'
+        amount:
+          type: string
+        currencyCode:
+          type: string
+
+    Account:
+      allOf:
+        - $ref: '#/components/schemas/WalletData'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              allOf:
+                - $ref: '#/components/schemas/Identifier'
+
+    TransactionData:
+      allOf:
+        - $ref: '#/components/schemas/WalletData'
+        - type: object
+          required:
+            - from
+            - to
+          properties:
+            from:
+              allOf:
+                - $ref: '#/components/schemas/Identifier'
+            to:
+              allOf:
+                - $ref: '#/components/schemas/Identifier'
 
     Transaction:
       allOf:
@@ -68,6 +99,12 @@ components:
             $ref: '#/components/schemas/TransactionData'
 
   responses:
+    AccountInfo:
+      description: Account info
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Account'
     TransactionInfo:
       description: Transaction info
       content:
